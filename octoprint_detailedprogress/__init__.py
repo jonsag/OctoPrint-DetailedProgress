@@ -23,6 +23,7 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 	_messages = []
 	_M73 = False
 	_PrusaStyle = False
+	_layerIs = "N/A"
 
 	def on_event(self, event, payload):
 		if event == Events.PRINT_STARTED:
@@ -59,16 +60,20 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 			self._repeat_timer.start()
 			self._logger.info("Printing resumed. Detailed progress unpaused.")
 			
+		elif event.startswith('DisplayLayerProgress'):			
+			self._layerIs = "{0}/{1}".format(payload['currentLayer'], payload['totalLayer'])
 
 	def do_work(self):
 		if not self._printer.is_printing():
 			# we have nothing to do here
 			return
 		try:
-			currentData = self._printer.get_current_data()
+			currentData = self._printer.get_current_data()			
 			currentData = self._sanitize_current_data(currentData)
 
 			message = self._get_next_message(currentData)
+			self._logger.info("Message: {0}".format(message))
+			
 			self._printer.commands("M117 {}".format(message))
 			if self._M73:
 				self._update_progress(currentData)
@@ -121,6 +126,7 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 				currentData["progress"]["printTimeLeft"])
 			currentData["progress"]["ETA"] = time.strftime(self._eta_strftime, time.localtime(
 				time.time() + currentData["progress"]["printTimeLeft"]))
+			currentData["progress"]["layerProgress"] = self._layerIs
 		except Exception as e:
 			self._logger.debug(
 				"Caught an exception trying to parse data: {0}\n Error is: {1}\nTraceback:{2}".format(currentData, e,
@@ -140,7 +146,8 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 			ETA=currentData["progress"]["ETA"],
 			filepos=currentData["progress"]["filepos"],
 			accuracy=currentData["progress"]["accuracy"],
-			filename=currentData["progress"]["filename"]
+			filename=currentData["progress"]["filename"],
+			layerProgress=currentData["progress"]["layerProgress"]
 		)
 
 	def _get_time_from_seconds(self, seconds):
@@ -182,13 +189,15 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 				'{completion:.2f}% complete',
 				'ETL {printTimeLeft}',
 				'ETA {ETA}',
-				'{accuracy} accuracy'
+				'{accuracy} accuracy', 
+				'Layer {layerProgress]'
 			],
 			messages=[
 				'{completion:.2f}% complete',
 				'ETL {printTimeLeft}',
 				'ETA {ETA}',
-				'{accuracy} accuracy'
+				'{accuracy} accuracy', 
+				'Layer {layerProgress]'
 			]
 		)
 
