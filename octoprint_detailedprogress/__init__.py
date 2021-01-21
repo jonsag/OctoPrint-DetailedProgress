@@ -190,14 +190,13 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 				'ETL {printTimeLeft}',
 				'ETA {ETA}',
 				'{accuracy} accuracy', 
-				'Layer {layerProgress]'
+				'Layer {layerProgress}'
 			],
 			messages=[
 				'{completion:.2f}% complete',
 				'ETL {printTimeLeft}',
 				'ETA {ETA}',
-				'{accuracy} accuracy', 
-				'Layer {layerProgress]'
+				'{accuracy} accuracy'
 			]
 		)
 
