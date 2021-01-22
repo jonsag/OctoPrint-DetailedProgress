@@ -23,9 +23,6 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 	_messages = []
 	_M73 = False
 	_PrusaStyle = False
-	_layerIs = "N/A"
-	_heightIs = "N/A"
-	_changeFilamentSeconds = "N/A"
 	
 	def on_event(self, event, payload):
 		if event == Events.PRINT_STARTED:
@@ -72,7 +69,7 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 			# we have nothing to do here
 			return
 		try:
-			currentData = self._printer.get_current_data()			
+			currentData = self._printer.get_current_data()
 			currentData = self._sanitize_current_data(currentData)
 
 			message = self._get_next_message(currentData)
@@ -104,6 +101,10 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 
 		currentData["progress"]["printTimeLeftString"] = "No ETL yet"
 		currentData["progress"]["ETA"] = "No ETA yet"
+		currentData["progress"]["layerProgress"] = "N/A"
+		currentData["progress"]["heightProgress"] = "N/A"
+		currentData["progress"]["changeFilamentIn"] = "N/A"
+		
 		accuracy = currentData["progress"]["printTimeLeftOrigin"]
 		if accuracy:
 			if accuracy == "estimate":
@@ -120,6 +121,7 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 		else:
 			accuracy = "N/A"
 		currentData["progress"]["accuracy"] = accuracy
+		
 		currentData["progress"]["filename"] = currentData["job"]["file"]["name"]
 
 		# Add additional data
@@ -132,7 +134,8 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 				time.time() + currentData["progress"]["printTimeLeft"]))
 			currentData["progress"]["layerProgress"] = self._layerIs
 			currentData["progress"]["heightProgress"] = self._heightIs
-			currentData["progress"]["changeFilamentIn"] = self._get_time_from_seconds(self._changeFilamentSeconds)
+			currentData["progress"]["changeFilamentIn"] = self._get_time_from_seconds(
+				self._changeFilamentSeconds)
 		except Exception as e:
 			self._logger.debug(
 				"Caught an exception trying to parse data: {0}\n Error is: {1}\nTraceback:{2}".format(currentData, e,
