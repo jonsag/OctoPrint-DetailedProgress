@@ -62,7 +62,7 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 		elif event.startswith('DisplayLayerProgress'):			
 			self._layerIs = "{0}/{1}".format(payload['currentLayer'], payload['totalLayer'])
 			self._heightIs = "{0}/{1}".format(payload['currentHeightFormatted'], payload['totalHeightFormatted'])
-			self._changeFilamentSeconds = "{0}".format(payload['changeFilamentTimeLeftInSeconds'])
+			self._changeFilamentSeconds = payload['changeFilamentTimeLeftInSeconds']
 			
 	def do_work(self):
 		if not self._printer.is_printing():
@@ -134,8 +134,12 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 				time.time() + currentData["progress"]["printTimeLeft"]))
 			currentData["progress"]["layerProgress"] = self._layerIs
 			currentData["progress"]["heightProgress"] = self._heightIs
-			currentData["progress"]["changeFilamentIn"] = self._get_time_from_seconds(
-				self._changeFilamentSeconds)
+			if isinstance(self._changeFilamentSeconds, int):
+				if self._changeFilamentSeconds == 0:
+					currentData["progress"]["changeFilamentIn"] = "N/A"
+				else: 
+					currentData["progress"]["changeFilamentIn"] = self._get_time_from_seconds(
+						self._changeFilamentSeconds)
 		except Exception as e:
 			self._logger.debug(
 				"Caught an exception trying to parse data: {0}\n Error is: {1}\nTraceback:{2}".format(currentData, e,
