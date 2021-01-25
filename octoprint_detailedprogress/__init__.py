@@ -207,7 +207,7 @@ class DetailedProgress(octoprint.plugin.EventHandlerPlugin,
 				'{accuracy} accuracy', 
 				'Layer {layerProgress}', 
 				'Height {heightProgress}', 
-				'Change filament in {changeFilamentIn}'
+				'Fil. change {changeFilamentIn}'
 			],
 			messages=[
 				'{completion:.2f}% complete',
