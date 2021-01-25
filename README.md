@@ -17,6 +17,8 @@ Install manually using this URL:
 If you also want to display layer progress, height progress or time to filament change, you will have to install the plugin [DisplayLayerProgress](https://plugins.octoprint.org/plugins/DisplayLayerProgress).
 Follow setup instructions for that plugin.
 
+You will probably want to disable 'Printer Display' in the settings for DisplayLayerProgress.
+
 ## Configuration
 
 ### Manual Config File
